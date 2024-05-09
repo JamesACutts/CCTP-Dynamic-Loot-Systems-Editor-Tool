@@ -20,6 +20,7 @@ public static class SpawnConfigTab
     internal static SpawnPoint newSpawnPoint = new SpawnPoint();
     static int numberOfCombos = 10;
     static Vector3 areaSize = Vector3.one * 10f;
+    static float radius = 10f;
     static Vector3 centerPosition = Vector3.zero;
 
     // Serialized class representing a spawn point in the database
@@ -210,8 +211,8 @@ public static class SpawnConfigTab
 
         // Label and input field for Area Size
         GUILayout.BeginHorizontal();
-        GUILayout.Label("Area Size:");
-        areaSize = EditorGUILayout.Vector3Field("", areaSize, GUILayout.MaxWidth(200));
+        GUILayout.Label("Radius Size:");
+        radius = EditorGUILayout.FloatField(radius, GUILayout.MaxWidth(120));
         GUILayout.EndHorizontal();
 
         // Label and input field for Center Position
@@ -485,12 +486,9 @@ public static class SpawnConfigTab
             // Randomly select a spawn point from the database
             SpawnPoint spawnPoint = spawnPointDatabase[UnityEngine.Random.Range(0, spawnPointDatabase.Count)];
 
-            // Generate random position within the specified area around the center position
-            Vector3 randomPosition = centerPosition + new Vector3(
-                UnityEngine.Random.Range(-areaSize.x / 2f, areaSize.x / 2f),
-                UnityEngine.Random.Range(-areaSize.y / 2f, areaSize.y / 2f),
-                UnityEngine.Random.Range(-areaSize.z / 2f, areaSize.z / 2f)
-            );
+            // Generate random position within the specified spherical volume around the center position
+            Vector3 randomPosition = centerPosition + UnityEngine.Random.insideUnitSphere * radius;
+            randomPosition.y = centerPosition.y;
 
             // Create an empty GameObject for the spawn point
             GameObject placeSpawnObject = new GameObject(spawnPoint.spawnPointName);
